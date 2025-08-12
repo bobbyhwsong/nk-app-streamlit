@@ -230,21 +230,5 @@ if "generated_script" in st.session_state:
         with open(markdown_file_path, "w", encoding="utf-8") as f:
             f.write(markdown_content)
         
-        st.success(f"✅ 상담이 완료되었습니다!")
-        st.success(f"📁 저장 위치: {user_folder}/")
-        st.success(f"📊 통합 JSON: consultation_{timestamp}.json")
-        st.success(f"📋 마크다운: consultation_{timestamp}.md")
-        
-        # 통합 JSON 파일 다운로드 버튼
-        st.download_button(
-            label="📥 통합 상담 데이터 다운로드 (JSON)",
-            data=json.dumps(integrated_data, ensure_ascii=False, indent=2),
-            file_name=f"consultation_{st.session_state.user_id}_{timestamp}.json",
-            mime="application/json",
-            use_container_width=True
-        )
-        
-        # 완료 후 상담 페이지로 돌아가기
-        if st.button("🏥 새로운 상담 시작하기"):
-            st.session_state.messages = []
-            st.switch_page("app.py")
+        # 저장 완료 후 바로 상담 페이지로 돌아가기
+        st.rerun()
