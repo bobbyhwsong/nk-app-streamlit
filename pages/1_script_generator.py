@@ -165,94 +165,86 @@ if "generated_script" in st.session_state:
         with st.expander(f"**{key.replace('_', ' ').title()}**", expanded=False):
             st.markdown(value)
     
-    # 스크립트 다운로드
-    st.markdown("---")
-    st.subheader("📥 스크립트 다운로드")
-    
-    # 마크다운 형식으로 스크립트 생성
-    script_text = f"""# 의사 상담 스크립트
 
-생성일시: {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}
-
-## 환자가 꼭 말해야 할 내용
-"""
-    for key, value in patient_info.items():
-        script_text += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
-    
-    script_text += f"""## 의사가 꼭 말해야 할 내용
-"""
-    for key, value in doctor_info.items():
-        script_text += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
-    
-    # 다운로드 버튼들
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.download_button(
-            label="📥 마크다운 파일로 다운로드",
-            data=script_text,
-            file_name=f"consultation_script_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-            mime="text/markdown",
-            use_container_width=True
-        )
-    
-    with col2:
-        st.download_button(
-            label="📊 JSON 파일로 다운로드",
-            data=json.dumps(script, ensure_ascii=False, indent=2),
-            file_name=f"consultation_script_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-            mime="application/json",
-            use_container_width=True
-        )
     
     # 완료 및 저장 버튼
     st.markdown("---")
     st.subheader("✅ 상담 완료")
     
     if st.button("🎯 상담 완료 및 저장", type="primary", use_container_width=True):
-        # 사용자 폴더 생성 및 파일 저장
+        # 통합된 JSON 데이터 생성
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # 대화 기록과 스크립트를 통합한 JSON 구조
+        integrated_data = {
+            "user_id": st.session_state.user_id,
+            "timestamp": timestamp,
+            "created_at": datetime.now().strftime("%Y년 %m월 %d일 %H:%M:%S"),
+            "conversation": {
+                "total_messages": len(st.session_state.messages),
+                "messages": [
+                    {
+                        "id": i + 1,
+                        "role": "환자" if msg["role"] == "user" else "의사",
+                        "content": msg["content"],
+                        "timestamp": datetime.now().strftime("%H:%M:%S")
+                    }
+                    for i, msg in enumerate(st.session_state.messages)
+                ]
+            },
+            "consultation_script": script
+        }
+        
+        # 사용자 폴더 생성
         user_folder = f"user_data/{st.session_state.user_id}"
         os.makedirs(user_folder, exist_ok=True)
         
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # 통합 JSON 파일 저장
+        json_file_path = f"{user_folder}/consultation_{timestamp}.json"
+        with open(json_file_path, "w", encoding="utf-8") as f:
+            json.dump(integrated_data, f, ensure_ascii=False, indent=2)
         
-        # 대화 기록 저장
-        conversation_file = f"{user_folder}/conversation_{timestamp}.txt"
-        with open(conversation_file, "w", encoding="utf-8") as f:
-            f.write(f"의사 상담 대화 기록 - {st.session_state.user_id}\n")
-            f.write(f"생성일시: {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}\n")
-            f.write("=" * 50 + "\n\n")
-            
-            for i, msg in enumerate(st.session_state.messages, 1):
-                role = "환자" if msg["role"] == "user" else "의사"
-                f.write(f"{i}. {role}: {msg['content']}\n\n")
+        # 마크다운 형식으로도 저장 (읽기 편함)
+        markdown_content = f"""# 의사 상담 완료 보고서
+
+## 👤 사용자 정보
+- **사용자 ID**: {st.session_state.user_id}
+- **상담 완료일시**: {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}
+
+## 💬 상담 요약
+- **총 대화 수**: {len(st.session_state.messages)}개
+- **상담 시작**: {st.session_state.messages[0]['content'][:50]}...
+- **상담 종료**: {st.session_state.messages[-1]['content'][:50]}...
+
+## 🗣️ 환자가 꼭 말해야 할 내용
+"""
+        for key, value in script["patient_must_tell"].items():
+            markdown_content += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
         
-        # 스크립트 저장
-        script_file = f"{user_folder}/script_{timestamp}.md"
-        with open(script_file, "w", encoding="utf-8") as f:
-            f.write(script_text)
+        markdown_content += f"""## 👨‍⚕️ 의사가 꼭 말해야 할 내용
+"""
+        for key, value in script["doctor_must_tell"].items():
+            markdown_content += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
         
-        # JSON 스크립트도 저장
-        json_script_file = f"{user_folder}/script_{timestamp}.json"
-        with open(json_script_file, "w", encoding="utf-8") as f:
-            json.dump(script, f, ensure_ascii=False, indent=2)
+        markdown_file_path = f"{user_folder}/consultation_{timestamp}.md"
+        with open(markdown_file_path, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
         
         st.success(f"✅ 상담이 완료되었습니다!")
         st.success(f"📁 저장 위치: {user_folder}/")
-        st.success(f"📝 대화 기록: conversation_{timestamp}.txt")
-        st.success(f"📋 스크립트: script_{timestamp}.md")
-        st.success(f"📊 JSON: script_{timestamp}.json")
+        st.success(f"📊 통합 JSON: consultation_{timestamp}.json")
+        st.success(f"📋 마크다운: consultation_{timestamp}.md")
+        
+        # 통합 JSON 파일 다운로드 버튼
+        st.download_button(
+            label="📥 통합 상담 데이터 다운로드 (JSON)",
+            data=json.dumps(integrated_data, ensure_ascii=False, indent=2),
+            file_name=f"consultation_{st.session_state.user_id}_{timestamp}.json",
+            mime="application/json",
+            use_container_width=True
+        )
         
         # 완료 후 상담 페이지로 돌아가기
         if st.button("🏥 새로운 상담 시작하기"):
             st.session_state.messages = []
             st.switch_page("app.py")
-
-# 하단 정보
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center; color: #666;'>
-    <p>⚠️ 이 시스템은 교육 및 참고용이며, 실제 의료 진단을 대체할 수 없습니다.</p>
-    <p>진료가 필요한 경우 반드시 전문의를 찾아 상담하시기 바랍니다.</p>
-</div>
-""", unsafe_allow_html=True)
