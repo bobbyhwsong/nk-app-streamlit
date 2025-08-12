@@ -230,5 +230,10 @@ if "generated_script" in st.session_state:
         with open(markdown_file_path, "w", encoding="utf-8") as f:
             f.write(markdown_content)
         
-        # 저장 완료 후 바로 상담 페이지로 돌아가기
-        st.rerun()
+        # 저장 완료 메시지 표시
+        st.success("✅ 완료되었습니다.")
+        
+        # 잠시 후 상담 페이지로 돌아가기
+        import time
+        time.sleep(2)
+        st.switch_page("app.py")
