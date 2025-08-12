@@ -233,7 +233,34 @@ if "generated_script" in st.session_state:
         # 저장 완료 메시지 표시
         st.success("✅ 완료되었습니다.")
         
-        # 잠시 후 상담 페이지로 돌아가기
-        import time
-        time.sleep(2)
-        st.switch_page("app.py")
+        # JSON 파일 다운로드 버튼 표시
+        st.markdown("---")
+        st.subheader("📥 다운로드")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.download_button(
+                label="📊 JSON 파일 다운로드",
+                data=json.dumps(integrated_data, ensure_ascii=False, indent=2),
+                file_name=f"consultation_{st.session_state.user_id}_{timestamp}.json",
+                mime="application/json",
+                use_container_width=True
+            )
+        
+        with col2:
+            st.download_button(
+                label="📋 마크다운 다운로드",
+                data=markdown_content,
+                file_name=f"consultation_{st.session_state.user_id}_{timestamp}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+        
+        st.markdown("---")
+        st.info("💡 위의 다운로드 버튼을 클릭하여 파일을 다운로드하세요.")
+        
+        # 새로운 상담 시작 버튼
+        if st.button("🏥 새로운 상담 시작하기", type="primary", use_container_width=True):
+            st.session_state.messages = []
+            st.switch_page("app.py")
