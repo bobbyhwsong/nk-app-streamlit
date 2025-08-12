@@ -33,7 +33,7 @@ if "messages" not in st.session_state:
     # 의사의 초기 인사 메시지 추가
     st.session_state.messages.append({
         "role": "assistant", 
-        "content": "안녕하세요! 어떻게 오셨나요? 어떤 증상으로 고민이 있으신지 말씀해 주세요."
+        "content": "안녕하세요! 어떻게 오셨나요?"
     })
 if "conversation_log" not in st.session_state:
     st.session_state.conversation_log = []
