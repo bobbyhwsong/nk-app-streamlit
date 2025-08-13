@@ -22,7 +22,7 @@ if not api_key:
 
 # 페이지 설정
 st.set_page_config(
-    page_title="의사 상담 시스템",
+    page_title="의사 진료 시스템",
     page_icon="🏥",
     layout="wide"
 )
@@ -99,7 +99,7 @@ def generate_doctor_response(user_message):
 
 
 # 메인 UI
-st.title("🏥 AI 의사 상담 시스템")
+st.title("🏥 AI 의사 진료 시스템")
 st.markdown("---")
 
 # 사이드바
@@ -125,7 +125,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📋 도움쪽지 생성")
-    if st.button("🔄 상담 도움쪽지 생성하기", type="primary", use_container_width=True, disabled=not user_id):
+    if st.button("🔄 진료 도움쪽지 생성하기", type="primary", use_container_width=True, disabled=not user_id):
         if st.session_state.messages:
             # 도움쪽지 페이지로 이동
             st.switch_page("pages/1_script_generator.py")
@@ -133,7 +133,7 @@ with st.sidebar:
             st.warning("먼저 의사와 대화를 나누어주세요.")
 
 # 메인 채팅 영역
-st.subheader("💬 의사와 상담하기")
+st.subheader("💬 의사와 진료하기")
 
 # 채팅 메시지 표시
 for message in st.session_state.messages:

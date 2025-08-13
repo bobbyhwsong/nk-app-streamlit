@@ -132,13 +132,47 @@ with st.sidebar:
 # 메인 콘텐츠
 st.subheader("💬 대화 기록 보기")
 
-# 대화 내용을 토글로 표시
+# 대화 내용을 시각적으로 개선하여 표시
 with st.expander("📝 전체 대화 내용 보기", expanded=False):
+    st.markdown("### 🗣️ 진료 대화 기록")
+    
     for i, msg in enumerate(st.session_state.messages):
         role = "환자" if msg["role"] == "user" else "의사"
-        st.markdown(f"**{i+1}. {role}**")
-        st.markdown(f"{msg['content']}")
-        st.markdown("---")
+        timestamp = datetime.now().strftime("%H:%M")
+        
+        # 환자와 의사 구분하여 표시
+        if msg["role"] == "user":  # 환자
+            with st.container():
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    st.markdown(f"**👤 환자**")
+                    st.markdown(f"*{timestamp}*")
+                with col2:
+                    st.markdown(f"""
+                    <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 5px solid #2196f3;">
+                        <strong>환자:</strong><br>
+                        {msg['content']}
+                    </div>
+                    """, unsafe_allow_html=True)
+        else:  # 의사
+            with st.container():
+                col1, col2 = st.columns([4, 1])
+                with col1:
+                    st.markdown(f"""
+                    <div style="background-color: #f3e5f5; padding: 15px; border-radius: 10px; border-right: 5px solid #9c27b0;">
+                        <strong>의사:</strong><br>
+                        {msg['content']}
+                    </div>
+                    """, unsafe_allow_html=True)
+                with col2:
+                    st.markdown(f"**👨‍⚕️ 의사**")
+                    st.markdown(f"*{timestamp}*")
+        
+        # 대화 간 구분선
+        if i < len(st.session_state.messages) - 1:
+            st.markdown("---")
+
+
 
 st.markdown("---")
 st.subheader("📋 도움쪽지 생성")
@@ -244,7 +278,7 @@ if "generated_script" in st.session_state:
             display_name = KEY_MAPPING.get(key, key.replace('_', ' ').title())
             markdown_content += f"### {display_name}\n{value}\n\n"
         
-        markdown_file_path = f"{user_folder}/consultation_{timestamp}.md"
+        markdown_file_path = f"{user_folder}/consultation_{st.session_state.user_id}_{timestamp}.md"
         with open(markdown_file_path, "w", encoding="utf-8") as f:
             f.write(markdown_content)
         
