@@ -146,7 +146,6 @@ with st.expander("📝 전체 대화 내용 보기", expanded=False):
                 col1, col2 = st.columns([1, 4])
                 with col1:
                     st.markdown(f"**👤 환자**")
-                    st.markdown(f"*{timestamp}*")
                 with col2:
                     st.markdown(f"""
                     <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 5px solid #2196f3;">
@@ -166,7 +165,6 @@ with st.expander("📝 전체 대화 내용 보기", expanded=False):
                     """, unsafe_allow_html=True)
                 with col2:
                     st.markdown(f"**👨‍⚕️ 의사**")
-                    st.markdown(f"*{timestamp}*")
         
         # 대화 간 구분선
         if i < len(st.session_state.messages) - 1:
