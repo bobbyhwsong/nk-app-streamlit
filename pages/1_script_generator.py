@@ -104,6 +104,20 @@ def generate_consultation_script():
 st.title("📋 상담 스크립트 생성")
 st.markdown("---")
 
+# 한글 키 매핑 정의
+KEY_MAPPING = {
+    'symptom_location': '증상 위치',
+    'symptom_timing': '증상 발생 시기',
+    'symptom_severity': '증상 심각도',
+    'current_medication': '현재 복용 중인 약물',
+    'allergy_info': '알레르기 정보',
+    'diagnosis_info': '진단 정보',
+    'prescription_info': '처방 정보',
+    'side_effects': '부작용',
+    'followup_plan': '추후 계획',
+    'emergency_plan': '응급 계획'
+}
+
 # 사이드바
 with st.sidebar:
     st.header("📋 설정")
@@ -153,7 +167,8 @@ if "generated_script" in st.session_state:
     st.markdown("### 🗣️ 환자가 꼭 말해야 할 내용")
     patient_info = script["patient_must_tell"]
     for key, value in patient_info.items():
-        with st.expander(f"**{key.replace('_', ' ').title()}**", expanded=False):
+        display_name = KEY_MAPPING.get(key, key.replace('_', ' ').title())
+        with st.expander(f"**{display_name}**", expanded=False):
             st.markdown(value)
     
     st.markdown("---")
@@ -162,7 +177,8 @@ if "generated_script" in st.session_state:
     st.markdown("### 👨‍⚕️ 의사가 꼭 말해야 할 내용")
     doctor_info = script["doctor_must_tell"]
     for key, value in doctor_info.items():
-        with st.expander(f"**{key.replace('_', ' ').title()}**", expanded=False):
+        display_name = KEY_MAPPING.get(key, key.replace('_', ' ').title())
+        with st.expander(f"**{display_name}**", expanded=False):
             st.markdown(value)
     
 
@@ -219,12 +235,14 @@ if "generated_script" in st.session_state:
 ## 🗣️ 환자가 꼭 말해야 할 내용
 """
         for key, value in script["patient_must_tell"].items():
-            markdown_content += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
+            display_name = KEY_MAPPING.get(key, key.replace('_', ' ').title())
+            markdown_content += f"### {display_name}\n{value}\n\n"
         
         markdown_content += f"""## 👨‍⚕️ 의사가 꼭 말해야 할 내용
 """
         for key, value in script["doctor_must_tell"].items():
-            markdown_content += f"### {key.replace('_', ' ').title()}\n{value}\n\n"
+            display_name = KEY_MAPPING.get(key, key.replace('_', ' ').title())
+            markdown_content += f"### {display_name}\n{value}\n\n"
         
         markdown_file_path = f"{user_folder}/consultation_{timestamp}.md"
         with open(markdown_file_path, "w", encoding="utf-8") as f:
