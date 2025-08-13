@@ -124,10 +124,10 @@ with st.sidebar:
         st.rerun()
     
     st.markdown("---")
-    st.markdown("### 📋 스크립트 생성")
-    if st.button("🔄 상담 스크립트 생성하기", type="primary", use_container_width=True, disabled=not user_id):
+    st.markdown("### 📋 도움쪽지 생성")
+    if st.button("🔄 상담 도움쪽지 생성하기", type="primary", use_container_width=True, disabled=not user_id):
         if st.session_state.messages:
-            # 스크립트 페이지로 이동
+            # 도움쪽지 페이지로 이동
             st.switch_page("pages/1_script_generator.py")
         else:
             st.warning("먼저 의사와 대화를 나누어주세요.")
