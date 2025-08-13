@@ -22,7 +22,7 @@ if not api_key:
 
 # 페이지 설정
 st.set_page_config(
-    page_title="상담 스크립트 생성",
+    page_title="상담 도움쪽지 생성",
     page_icon="📋",
     layout="wide"
 )
@@ -42,7 +42,7 @@ if "user_id" not in st.session_state or not st.session_state.user_id:
     st.stop()
 
 def generate_consultation_script():
-    """대화 내용을 바탕으로 상담 스크립트 생성"""
+    """대화 내용을 바탕으로 상담 도움쪽지 생성"""
     try:
         # 대화 내용 요약
         conversation_summary = "\n".join([
@@ -93,15 +93,15 @@ def generate_consultation_script():
             return script_data
         except json.JSONDecodeError:
             # JSON 파싱 실패 시 텍스트로 반환
-            return {"error": "스크립트 생성 중 오류가 발생했습니다.", "raw_response": response.choices[0].message.content}
+            return {"error": "도움쪽지 생성 중 오류가 발생했습니다.", "raw_response": response.choices[0].message.content}
             
     except Exception as e:
-        return {"error": f"스크립트 생성 중 오류가 발생했습니다: {str(e)}"}
+        return {"error": f"도움쪽지 생성 중 오류가 발생했습니다: {str(e)}"}
 
 
 
 # 메인 UI
-st.title("📋 상담 스크립트 생성")
+st.title("📋 상담 도움쪽지 생성")
 st.markdown("---")
 
 # 한글 키 매핑 정의
@@ -141,27 +141,27 @@ with st.expander("📝 전체 대화 내용 보기", expanded=False):
         st.markdown("---")
 
 st.markdown("---")
-st.subheader("📋 스크립트 생성")
+st.subheader("📋 도움쪽지 생성")
 
-if st.button("🔄 스크립트 생성하기", type="primary", use_container_width=True):
-    with st.spinner("상담 스크립트를 생성하고 있습니다..."):
+if st.button("🔄 도움쪽지 생성하기", type="primary", use_container_width=True):
+    with st.spinner("상담 도움쪽지를 생성하고 있습니다..."):
         script = generate_consultation_script()
         
         if "error" not in script:
-            st.success("✅ 스크립트가 성공적으로 생성되었습니다!")
+            st.success("✅ 도움쪽지가 성공적으로 생성되었습니다!")
             
-            # 스크립트 데이터를 세션에 저장
+            # 도움쪽지 데이터를 세션에 저장
             st.session_state.generated_script = script
             st.rerun()
         else:
-            st.error(f"❌ 스크립트 생성 실패: {script['error']}")
+            st.error(f"❌ 도움쪽지 생성 실패: {script['error']}")
 
-# 생성된 스크립트 표시
+# 생성된 도움쪽지 표시
 if "generated_script" in st.session_state:
     script = st.session_state.generated_script
     
     st.markdown("---")
-    st.subheader("🎯 생성된 상담 스크립트")
+    st.subheader("🎯 생성된 상담 도움쪽지")
     
     # 환자가 꼭 말해야 할 내용
     st.markdown("### 🗣️ 환자가 꼭 말해야 할 내용")
@@ -191,7 +191,7 @@ if "generated_script" in st.session_state:
         # 통합된 JSON 데이터 생성
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        # 대화 기록과 스크립트를 통합한 JSON 구조
+        # 대화 기록과 도움쪽지를 통합한 JSON 구조
         integrated_data = {
             "user_id": st.session_state.user_id,
             "timestamp": timestamp,
