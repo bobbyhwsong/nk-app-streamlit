@@ -22,27 +22,27 @@ if not api_key:
 
 # 페이지 설정
 st.set_page_config(
-    page_title="상담 도움쪽지 생성",
+    page_title="진료 도움쪽지 생성",
     page_icon="📋",
     layout="wide"
 )
 
 # 세션 상태 확인
 if "messages" not in st.session_state or not st.session_state.messages:
-    st.error("대화 내용이 없습니다. 먼저 의사와 상담을 진행해주세요.")
-    if st.button("🏥 상담 페이지로 돌아가기"):
+    st.error("대화 내용이 없습니다. 먼저 의사와 진료을 진행해주세요.")
+    if st.button("🏥 진료 페이지로 돌아가기"):
         st.switch_page("app.py")
     st.stop()
 
 # 사용자 ID 확인
 if "user_id" not in st.session_state or not st.session_state.user_id:
-    st.error("사용자 ID가 설정되지 않았습니다. 상담 페이지에서 사용자 ID를 입력해주세요.")
-    if st.button("🏥 상담 페이지로 돌아가기"):
+    st.error("사용자 ID가 설정되지 않았습니다. 진료 페이지에서 사용자 ID를 입력해주세요.")
+    if st.button("🏥 진료 페이지로 돌아가기"):
         st.switch_page("app.py")
     st.stop()
 
 def generate_consultation_script():
-    """대화 내용을 바탕으로 상담 도움쪽지 생성"""
+    """대화 내용을 바탕으로 진료 도움쪽지 생성"""
     try:
         # 대화 내용 요약
         conversation_summary = "\n".join([
@@ -50,7 +50,7 @@ def generate_consultation_script():
             for msg in st.session_state.messages
         ])
         
-        script_prompt = f"""다음은 환자와 의사의 상담 내용입니다:
+        script_prompt = f"""다음은 환자와 의사의 진료 내용입니다:
 
 {conversation_summary}
 
@@ -80,7 +80,7 @@ def generate_consultation_script():
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "당신은 의료 상담 전문가입니다. 환자와 의사가 준비해야 할 내용을 체계적으로 정리해주세요."},
+                {"role": "system", "content": "당신은 의료 진료 전문가입니다. 환자와 의사가 준비해야 할 내용을 체계적으로 정리해주세요."},
                 {"role": "user", "content": script_prompt}
             ],
             max_tokens=800,
@@ -101,7 +101,7 @@ def generate_consultation_script():
 
 
 # 메인 UI
-st.title("📋 상담 도움쪽지 생성")
+st.title("📋 진료 도움쪽지 생성")
 st.markdown("---")
 
 # 한글 키 매핑 정의
@@ -122,7 +122,7 @@ KEY_MAPPING = {
 with st.sidebar:
     st.header("📋 설정")
     
-    if st.button("🏥 상담 페이지로 돌아가기"):
+    if st.button("🏥 진료 페이지로 돌아가기"):
         st.switch_page("app.py")
     
     if st.button("🗑️ 대화 초기화"):
@@ -144,7 +144,7 @@ st.markdown("---")
 st.subheader("📋 도움쪽지 생성")
 
 if st.button("🔄 도움쪽지 생성하기", type="primary", use_container_width=True):
-    with st.spinner("상담 도움쪽지를 생성하고 있습니다..."):
+    with st.spinner("진료 도움쪽지를 생성하고 있습니다..."):
         script = generate_consultation_script()
         
         if "error" not in script:
@@ -161,7 +161,7 @@ if "generated_script" in st.session_state:
     script = st.session_state.generated_script
     
     st.markdown("---")
-    st.subheader("🎯 생성된 상담 도움쪽지")
+    st.subheader("🎯 생성된 진료 도움쪽지")
     
     # 환자가 꼭 말해야 할 내용
     st.markdown("### 🗣️ 환자가 꼭 말해야 할 내용")
@@ -185,9 +185,9 @@ if "generated_script" in st.session_state:
     
     # 완료 및 저장 버튼
     st.markdown("---")
-    st.subheader("✅ 상담 완료")
+    st.subheader("✅ 진료 완료")
     
-    if st.button("🎯 상담 완료 및 저장", type="primary", use_container_width=True):
+    if st.button("🎯 진료 완료 및 저장", type="primary", use_container_width=True):
         # 통합된 JSON 데이터 생성
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
@@ -221,16 +221,16 @@ if "generated_script" in st.session_state:
             json.dump(integrated_data, f, ensure_ascii=False, indent=2)
         
         # 마크다운 형식으로도 저장 (읽기 편함)
-        markdown_content = f"""# 의사 상담 완료 보고서
+        markdown_content = f"""# 의사 진료 완료 보고서
 
 ## 👤 사용자 정보
 - **사용자 ID**: {st.session_state.user_id}
-- **상담 완료일시**: {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}
+- **진료 완료일시**: {datetime.now().strftime('%Y년 %m월 %d일 %H:%M:%S')}
 
-## 💬 상담 요약
+## 💬 진료 요약
 - **총 대화 수**: {len(st.session_state.messages)}개
-- **상담 시작**: {st.session_state.messages[0]['content'][:50]}...
-- **상담 종료**: {st.session_state.messages[-1]['content'][:50]}...
+- **진료 시작**: {st.session_state.messages[0]['content'][:50]}...
+- **진료 종료**: {st.session_state.messages[-1]['content'][:50]}...
 
 ## 🗣️ 환자가 꼭 말해야 할 내용
 """
@@ -278,7 +278,7 @@ if "generated_script" in st.session_state:
         st.markdown("---")
         st.info("💡 위의 다운로드 버튼을 클릭하여 파일을 다운로드하세요.")
         
-        # 새로운 상담 시작 버튼
-        if st.button("🏥 새로운 상담 시작하기", type="primary", use_container_width=True):
+        # 새로운 진료 시작 버튼
+        if st.button("🏥 새로운 진료 시작하기", type="primary", use_container_width=True):
             st.session_state.messages = []
             st.switch_page("app.py")
